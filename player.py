@@ -1,4 +1,5 @@
 import os
+import time
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -9,8 +10,30 @@ class Player:
         self.items = []
         self.health = 50
         self.alive = True
+        self.cry_count = 0
     # goes in specified direction if possible, returns True
     # if not possible returns False
+    def cry(self):
+        self.cry_count += 1
+        clear()
+        print("You cry.")
+        print()
+        if self.cry_count > 5:
+            print('Your eyes are starting to feel dry.')
+            print()
+        if self.cry_count > 50:
+            print('You are starting to feel dehydrated.\nMaybe you should stop crying so much.')
+            print()
+        if self.cry_count > 90:
+            print('You feel you are dying of thirst!\nAll the water in your body is exiting through your eyes!')
+            print()
+        if self.cry_count > 100:
+            print('All the water in your body is gone!\nYour body no longer has enough water to function.')
+            print()
+            print('You lose.')
+            self.alive = False
+        print()
+        input("Press enter to continue...")
     def go_direction(self, direction):
         new_location = self.location.get_destination(direction.lower())
         if new_location is not None:

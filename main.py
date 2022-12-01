@@ -48,7 +48,7 @@ def show_help():
     print("go <direction> -- moves you in the given direction")
     print("inventory -- opens your inventory")
     print("pickup <item> -- picks up the item")
-    print("quit -- quits the game")
+    print("exit -- quits the game")
     print()
     input("Press enter to continue...")
 
@@ -56,8 +56,11 @@ def show_help():
 if __name__ == "__main__":
     create_world()
     playing = True
+    frame = 0
     while playing and player.alive:
+        frame += 1
         print_situation()
+        print(frame)
         command_success = False
         time_passes = False
         while not command_success:
@@ -98,6 +101,8 @@ if __name__ == "__main__":
                     else:
                         print("No such monster.")
                         command_success = False
+                case "cry":
+                    player.cry()
                 case other:
                     print("Not a valid command")
                     command_success = False
