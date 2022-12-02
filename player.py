@@ -48,6 +48,16 @@ class Player:
             self.drop(self.items[0])
     def gain_hp(self, hp):
         self.health += hp
+    def eat(self, item):
+        self.health += item.nv
+        if item in self.items:
+            self.items.remove(item)
+        if item in self.location.items:
+            self.location.items.remove(item)
+        clear()
+        print(f"You slurp {item.name} up. Slurpity slurp slurp slurp. Sluuuurrrrrrp. Fuck, that tastes {'good' if item.nv > 0 else 'awful'}. Who knows where it goes.")
+        print()
+        input("Press enter to continue...")
     def get_item_by_name(self, name):
         for i in self.items:
             if i.name.lower() == name.lower():

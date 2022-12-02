@@ -8,18 +8,23 @@ import updater
 player = Player()
 
 def create_world():
-    a = Room("You are in room 1")
-    b = Room("You are in room 2")
-    c = Room("You are in room 3")
-    d = Room("You are in room 4")
-    Room.connect_rooms(a, "east", b, "west")
-    Room.connect_rooms(c, "east", d, "west")
-    Room.connect_rooms(a, "north", c, "south")
-    Room.connect_rooms(b, "north", d, "south")
+    a = Room("You are in a weird hotel lobby")
+    b = Room("You are on the first floor of a weird hotel.\nIt's green!")
+    c = Room("You are on the second floor of a weird hotel.\nIt's the color that you fail to see whenever you try to think up new colors!\nThe color could make Lovecraft less racist.")
+    d = Room("You are on the fourth floor of a weird hotel.\nIt's blue!")
+    hell = Room("You are in hell")
+    Room.connect_rooms(a, "upstairs", b, "downstairs")
+    Room.connect_rooms(b, "upstairs", c, "downstairs")
+    Room.connect_rooms(c, "upstairs", d, "downstairs")
+    Room.connect_rooms(d, "jump", a, "jump")
     i = Item("Rock", "This is just a rock.")
     i.put_in_room(b)
     balongadongas = Bed("Bed", "Comfy, comfy bed. Go eep in the bed.")
     balongadongas.put_in_room(a)
+    hellbox = Container("Hellbox", "Box on fire. Maybe you should sleep in the box.")
+    hellbox.put_in_room(hell)
+    f = Food("Kronkle",'''This is kronkle, your favorite treat.\nYou remember when your grandmother would bake a kronkle for you.\n"Eat up", she would say. "It's good for you."\nYou hardly need her encouragement now.\nYou are overcome by a lust for the kronkle.''', 69) # nice
+    f.put_in_room(d)
     player.location = a
     Monster("Bob the monster", 20, b)
 

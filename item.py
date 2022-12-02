@@ -32,3 +32,22 @@ class Bed(Item):
         print()
         input("Press enter to continue...")
 
+class Food(Item):
+    def __init__(self, name, desc, nutrition_value):
+        super().__init__(name, desc)
+        self.kind = 'Food'
+        self.nv = nutrition_value
+
+class Container(Item):
+    def __init__(self, name, desc):
+        super().__init__(name, desc)
+        self.kind = 'Container'
+        self.items = []
+
+    def show_contents(self):
+        print(self.desc)
+        print("It contains the following:")
+        for i in self.items:
+            print(i.name)
+        print()
+        input("Press enter to continue...")
