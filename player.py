@@ -17,16 +17,12 @@ class Player:
         self.cry_count += 1
         clear()
         print("You cry.")
-        print()
         if self.cry_count > 5:
             print('Your eyes are starting to feel dry.')
-            print()
         if self.cry_count > 50:
             print('You are starting to feel dehydrated.\nMaybe you should stop crying so much.')
-            print()
         if self.cry_count > 90:
             print('You feel you are dying of thirst!\nAll the water in your body is exiting through your eyes!')
-            print()
         if self.cry_count > 100:
             print('All the water in your body is gone!\nYour body no longer has enough water to function.')
             print()
@@ -44,6 +40,19 @@ class Player:
         self.items.append(item)
         item.loc = self
         self.location.remove_item(item)
+    def drop(self, item):
+        self.items.remove(item)
+        item.put_in_room(self.location)
+    def drop_all(self):
+        while self.items != []:
+            self.drop(self.items[0])
+    def gain_hp(self, hp):
+        self.health += hp
+    def get_item_by_name(self, name):
+        for i in self.items:
+            if i.name.lower() == name.lower():
+                return i
+        return False
     def show_inventory(self):
         clear()
         print("You are currently carrying:")

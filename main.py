@@ -1,6 +1,6 @@
 from room import Room
 from player import Player
-from item import Item
+from item import *
 from monster import Monster
 import os
 import updater
@@ -18,6 +18,8 @@ def create_world():
     Room.connect_rooms(b, "north", d, "south")
     i = Item("Rock", "This is just a rock.")
     i.put_in_room(b)
+    balongadongas = Bed("Bed", "Comfy, comfy bed. Go eep in the bed.")
+    balongadongas.put_in_room(a)
     player.location = a
     Monster("Bob the monster", 20, b)
 
@@ -52,15 +54,14 @@ def show_help():
     print()
     input("Press enter to continue...")
 
+def time_pass():
+    updater.update_all()
 
 if __name__ == "__main__":
     create_world()
     playing = True
-    frame = 0
     while playing and player.alive:
-        frame += 1
         print_situation()
-        print(frame)
         command_success = False
         time_passes = False
         while not command_success:
@@ -87,10 +88,64 @@ if __name__ == "__main__":
                     else:
                         print("No such item.")
                         command_success = False
+                case "drop":  #can handle multi-word objects
+                    target_name = command[5:] # everything after "pickup "
+                    if target_name == 'all':
+                        player.drop_all()
+                    else:
+                        target = player.get_item_by_name(target_name)
+                        if target != False:
+                            player.drop(target)
+                        else:
+                            print("No such item.")
+                            command_success = False
+                case "inspect":
+                    target_name = command[8:]
+                    target = player.get_item_by_name(target_name)
+                    if target == False:
+                        target = player.location.get_item_by_name(target_name)
+                    if target != False:
+                        target.describe()
+                    else:
+                        print("No such item.")
+                        command_success = False
+                case "sleep":
+                    target_name = command[6:]
+                    target = player.location.get_item_by_name(target_name)
+                    if target != False:
+                        if target.kind == 'Bed':
+                            target.sleep(player)
+                        else:
+                            print("That's not a bed!")
+                            command_success = False
+                    else:
+                        print("No such item.")
+                        command_success = False
+                case "eat":
+                    target_name = command[4:]
+                    target = player.location.get_item_by_name(target_name)
+                    if target != False:
+                        if target.kind == 'Food':
+                            player.eat(target)
+                        else:
+                            print("You can't eat that!")
+                            command_success = False
+                    else:
+                        print("No such item.")
+                        command_success = False
                 case "inventory":
                     player.show_inventory()
                 case "help":
                     show_help()
+                case "wait":
+                    time = 1
+                    if len(command) > 4:
+                        time = int(command[5:])
+                    clear()
+                    for i in range(time):
+                        updater.update_all()
+                    print("Some time has passed.")
+                    input("Press enter to continue...")
                 case "exit":
                     playing = False
                 case "attack":

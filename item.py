@@ -1,4 +1,5 @@
 import os
+from random import randint
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -8,6 +9,7 @@ class Item:
         self.name = name
         self.desc = desc
         self.loc = None
+        self.kind = 'Generic'
     def describe(self):
         clear()
         print(self.desc)
@@ -16,3 +18,17 @@ class Item:
     def put_in_room(self, room):
         self.loc = room
         room.add_item(self)
+
+class Bed(Item):
+    def __init__(self, name, desc):
+        super().__init__(name, desc)
+        self.kind = 'Bed'
+    def sleep(self, player):
+        hp = sum([randint(0,3) for _ in range(10)])
+        player.gain_hp(hp)
+        clear()
+        print("You've ept! Hope you had a good eep.")
+        print(f"You've regenerated {hp} hitpoints!")
+        print()
+        input("Press enter to continue...")
+
