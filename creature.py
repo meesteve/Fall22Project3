@@ -5,27 +5,27 @@ import os
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-class Monster:
+class Creature:
     def __init__(self, name, health, attack, room):
         self.name = name
         self.health = health
         self.room = room
         self.atk = attack
-        room.add_monster(self)
+        room.add_creature(self)
         updater.register(self)
         self.kind = 'Neutral'
     def update(self):
         if random.random() < .5:
             self.move_to(self.room.random_neighbor())
     def move_to(self, room):
-        self.room.remove_monster(self)
+        self.room.remove_creature(self)
         self.room = room
-        room.add_monster(self)
+        room.add_creature(self)
     def die(self):
-        self.room.remove_monster(self)
+        self.room.remove_creature(self)
         updater.deregister(self)
 
-class Enemy(Monster):
+class Enemy(Creature):
     def __init__(self, name, health, attack, room):
         super().__init__(name, health, attack, room)
         self.kind = 'Enemy'
@@ -68,14 +68,14 @@ class Enemy(Monster):
         input("Press enter to continue...")
         
 
-class Friend(Monster):
+class Friend(Creature):
     def __init__(self, name, health, attack, room):
         super().__init__(name, health, attack, room)
         self.kind = 'Friend'
     
     def update(self):
         if self.room.player != False:
-            for m in self.room.monsters:
+            for m in self.room.creatures:
                 if m.kind == 'Enemy':
                     self.attack(m)
                     return None

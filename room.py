@@ -4,7 +4,7 @@ class Room:
     def __init__(self, description):
         self.desc = description
         self.player = False
-        self.monsters = []
+        self.creatures = []
         self.exits = []
         self.items = []
     def add_exit(self, exit_name, destination):
@@ -24,10 +24,10 @@ class Room:
         self.items.append(item)
     def remove_item(self, item):
         self.items.remove(item)
-    def add_monster(self, monster):
-        self.monsters.append(monster)
-    def remove_monster(self, monster):
-        self.monsters.remove(monster)
+    def add_creature(self, creature):
+        self.creatures.append(creature)
+    def remove_creature(self, creature):
+        self.creatures.remove(creature)
     def has_items(self):
         return self.items != []
     def get_item_by_name(self, name):
@@ -35,10 +35,10 @@ class Room:
             if i.name.lower() == name.lower():
                 return i
         return False
-    def has_monsters(self):
-        return self.monsters != []
-    def get_monster_by_name(self, name):
-        for i in self.monsters:
+    def has_creatures(self):
+        return self.creatures != []
+    def get_creature_by_name(self, name):
+        for i in self.creatures:
             if i.name.lower() == name.lower():
                 return i
         return False

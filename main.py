@@ -1,7 +1,7 @@
 from room import *
 from player import *
 from item import *
-from monster import *
+from creature import *
 import os
 import updater
 from fish import *
@@ -23,15 +23,15 @@ def create_world():
     Room.connect_rooms(e, "upstairs", r, "downstairs")
     i = Item("Note", "This is a note. You can't read what it says.\nFun fact! This is because you can't read.")
     i.put_in_room(b)
-    balongadongas = Bed("Bed", "Comfy, comfy bed. Go eep in the bed.")
-    balongadongas.put_in_room(a)
-    hellbox = Container("Hellbox", "Box on fire. Maybe you should sleep in the box.")
-    hellbox.put_in_room(hell)
-    f = Food("Kronkle",'''This is kronkle, your favorite treat.\nYou remember when your grandmother would bake a kronkle for you.\n"Yonkle wonkle!", she would say. "Ihonkle gonkle fonkle yonkle."\nYou hardly need her encouragement now.\nYou are overcome by a lust for the kronkle.''', 12)
+    bed = Bed("Bed", "Comfy, comfy bed. Go eep in the bed.")
+    bed.put_in_room(a)
+    box = Container("Box", "Box on fire. Maybe you should sleep in the box.")
+    box.put_in_room(r)
+    f = Food("Kronkle",'''This is kronkle, your favorite treat.\nYou remember when your grandmother would bake a kronkle for you.\n"Yonkle uhonkle!", she would say. "Ihonkle gonkle fonkle yonkle."\nYou hardly need her encouragement now.\nYou are overcome by a lust for the kronkle.''', 12)
     f.put_in_room(d)
     player.location = a
     a.player = player
-    Monster("Bonkle donkle", 20, 3, b)
+    Creature("Bonkle donkle", 20, 3, b)
     Friend("Macaroni", 100, 1, b)
     Enemy("Johnny", 1, 8, r)
 
@@ -43,9 +43,9 @@ def print_situation():
     clear()
     print(player.location.desc)
     print()
-    if player.location.has_monsters():
-        print("This room contains the following monsters:")
-        for m in player.location.monsters:
+    if player.location.has_creatures():
+        print("This room contains the following creatures:")
+        for m in player.location.creatures:
             print(m.name)
         print()
     if player.location.has_items():
@@ -60,10 +60,20 @@ def print_situation():
 
 def show_help():
     clear()
-    print("go <direction> -- moves you in the given direction")
-    print("inventory -- opens your inventory")
-    print("pickup <item> -- picks up the item")
-    print("exit -- quits the game")
+    print("go <direction> -- moves you in the given direction.")
+    print("inventory -- opens your inventory.")
+    print("pickup <item> -- picks up the item.")
+    print("drop <item> -- drops the item.")
+    print("drop all -- drops every item.")
+    print("inspect <item> -- inspects the item.")
+    print("sleep <item> -- lets you sleep on the item, if possible. regains life. dreams.")
+    print("eat <item> -- lets you eat the item, if possible. regains life.")
+    print("open <item> -- lets you open the item, if possible.")
+    print("wait <n> -- lets you sleep for n turns. if no n is given,\n            treats n as 1. does not regain life.")
+    print("attack <creature> -- lets you attack the creature.")
+    print("pet <creature> -- lets you pet the creature. may regain life.")
+    print("cry -- lets you cry.")
+    print("exit -- quits the game.")
     print()
     input("Press enter to continue...")
 
@@ -153,6 +163,19 @@ if __name__ == "__main__":
                     else:
                         print("No such item.")
                         command_success = False
+                case "open":
+                    target_name = command[5:]
+                    target = player.location.get_item_by_name(target_name)
+                    if target != False:
+                        if target.kind == 'Container':
+                            target.open = True
+                            print(f"You've opened {target.name}")
+                        else:
+                            print("You can't open that!")
+                            command_success = False
+                    else:
+                        print("No such item.")
+                        command_success = False
                 case "inventory":
                     player.show_inventory()
                 case "help":
@@ -172,19 +195,19 @@ if __name__ == "__main__":
                     playing = False
                 case "attack":
                     target_name = command[7:]
-                    target = player.location.get_monster_by_name(target_name)
+                    target = player.location.get_creature_by_name(target_name)
                     if target != False:
-                        player.attack_monster(target)
+                        player.attack_creature(target)
                     else:
-                        print("No such monster.")
+                        print("No such creature.")
                         command_success = False
                 case "pet":
                     target_name = command[4:]
-                    target = player.location.get_monster_by_name(target_name)
+                    target = player.location.get_creature_by_name(target_name)
                     if target != False:
-                        player.pet_monster(target)
+                        player.pet_creature(target)
                     else:
-                        print("No such monster.")
+                        print("No such creature.")
                         command_success = False
                 case "cry":
                     player.cry()

@@ -74,7 +74,7 @@ class Player:
             print(i.name)
         print()
         input("Press enter to continue...")
-    def pet_monster(self, mon):
+    def pet_creature(self, mon):
         clear()
         print(f"You are petting {mon.name}")
         if mon.kind == 'Friend':
@@ -85,7 +85,7 @@ class Player:
         else:
             print(f"{mon.name} is hating this. They are scared of you.")
         input("Press enter to continue...")
-    def attack_monster(self, mon):
+    def attack_creature(self, mon):
         clear()
         print("You are attacking " + mon.name)
         print()

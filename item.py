@@ -43,6 +43,7 @@ class Container(Item):
         super().__init__(name, desc)
         self.kind = 'Container'
         self.items = []
+        self.open = False
 
     def show_contents(self):
         print(self.desc)
