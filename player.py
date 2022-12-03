@@ -1,5 +1,4 @@
 import os
-import time
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -11,6 +10,7 @@ class Player:
         self.health = 50
         self.alive = True
         self.cry_count = 0
+        self.asleep = False
     # goes in specified direction if possible, returns True
     # if not possible returns False
     def cry(self):
@@ -33,7 +33,9 @@ class Player:
     def go_direction(self, direction):
         new_location = self.location.get_destination(direction.lower())
         if new_location is not None:
+            self.location.player = False
             self.location = new_location
+            self.location.player = self
             return True
         return False
     def pickup(self, item):

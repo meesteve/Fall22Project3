@@ -3,6 +3,7 @@ import random
 class Room:
     def __init__(self, description):
         self.desc = description
+        self.player = False
         self.monsters = []
         self.exits = []
         self.items = []

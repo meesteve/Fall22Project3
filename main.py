@@ -1,9 +1,10 @@
-from room import Room
-from player import Player
+from room import *
+from player import *
 from item import *
-from monster import Monster
+from monster import *
 import os
 import updater
+from fish import *
 
 player = Player()
 
@@ -11,22 +12,27 @@ def create_world():
     a = Room("You are in a weird hotel lobby")
     b = Room("You are on the first floor of a weird hotel.\nIt's green!")
     c = Room("You are on the second floor of a weird hotel.\nIt's the color that you fail to see whenever you try to think up new colors!\nThe color could make Lovecraft less racist.")
-    d = Room("You are on the fourth floor of a weird hotel.\nIt's blue!")
+    d = Room("You are on the third floor of a weird hotel.\nIt's blue!")
+    e = Room("You are on the fourth floor of a weird hotel.\nIt's gay. Homosexual.")
+    r = Room("You are on the roof of a weird hotel.\nYou look around you.\nThere is nothing that you can see.\nNothing at all.\nNo trees. No buildings. No stars.\nNo stars.\nNo stars.")
     hell = Room("You are in hell")
     Room.connect_rooms(a, "upstairs", b, "downstairs")
     Room.connect_rooms(b, "upstairs", c, "downstairs")
     Room.connect_rooms(c, "upstairs", d, "downstairs")
-    Room.connect_rooms(d, "jump", a, "jump")
-    i = Item("Rock", "This is just a rock.")
+    Room.connect_rooms(d, "upstairs", e, "downstairs")
+    Room.connect_rooms(e, "upstairs", r, "downstairs")
+    i = Item("Note", "This is a note. You can't read what it says.\nFun fact! This is because you can't read.")
     i.put_in_room(b)
     balongadongas = Bed("Bed", "Comfy, comfy bed. Go eep in the bed.")
     balongadongas.put_in_room(a)
     hellbox = Container("Hellbox", "Box on fire. Maybe you should sleep in the box.")
     hellbox.put_in_room(hell)
-    f = Food("Kronkle",'''This is kronkle, your favorite treat.\nYou remember when your grandmother would bake a kronkle for you.\n"Eat up", she would say. "It's good for you."\nYou hardly need her encouragement now.\nYou are overcome by a lust for the kronkle.''', 69) # nice
+    f = Food("Kronkle",'''This is kronkle, your favorite treat.\nYou remember when your grandmother would bake a kronkle for you.\n"Yonkle wonkle!", she would say. "Ihonkle gonkle fonkle yonkle."\nYou hardly need her encouragement now.\nYou are overcome by a lust for the kronkle.''', 12)
     f.put_in_room(d)
     player.location = a
-    Monster("Bob the monster", 20, b)
+    a.player = player
+    Monster("Bonkle donkle", 20, b)
+    Enemy("Johnny", 1, r)
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -119,7 +125,14 @@ if __name__ == "__main__":
                     target = player.location.get_item_by_name(target_name)
                     if target != False:
                         if target.kind == 'Bed':
+                            clear()
+                            print("You fall into a dream.")
+                            input("Press enter to continue...")
+                            fish_game()
+                            input("Press enter to continue...")
                             target.sleep(player)
+                            for _ in range(3):
+                                updater.update_all()
                         else:
                             print("That's not a bed!")
                             command_success = False
@@ -147,10 +160,12 @@ if __name__ == "__main__":
                     if len(command) > 4:
                         time = int(command[5:])
                     clear()
-                    for i in range(time):
-                        updater.update_all()
                     print("Some time has passed.")
                     input("Press enter to continue...")
+                    player.asleep = True
+                    for i in range(time):
+                        updater.update_all()
+                    player.asleep = False
                 case "exit":
                     playing = False
                 case "attack":
