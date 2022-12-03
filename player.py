@@ -8,6 +8,7 @@ class Player:
         self.location = None
         self.items = []
         self.health = 50
+        self.atk = 7
         self.alive = True
         self.cry_count = 0
         self.asleep = False
@@ -73,18 +74,42 @@ class Player:
             print(i.name)
         print()
         input("Press enter to continue...")
+    def pet_monster(self, mon):
+        clear()
+        print(f"You are petting {mon.name}")
+        if mon.kind == 'Friend':
+            print(f"{mon.name} loves it! You can see them wagging their little tail.\nOr... no, wait, {mon.name} doesn't have a tail.\nWhat are you seeing? How can you tell that they're happy?\nHow do you know what's even real?\nWell, you can tell that {mon.name} is happy.\nExistential crisis postponed because ohmigosh they're so cuuuuuuteeeeeee~\n")
+            print(f"Both you and {mon.name} gain hitpoints.")
+            self.health += mon.atk
+            mon.health += self.atk
+        else:
+            print(f"{mon.name} is hating this. They are scared of you.")
+        input("Press enter to continue...")
     def attack_monster(self, mon):
         clear()
         print("You are attacking " + mon.name)
         print()
         print("Your health is " + str(self.health) + ".")
+        print(f"Your attack is {self.atk}.")
         print(mon.name + "'s health is " + str(mon.health) + ".")
+        print(f"{mon.name}'s attack is {mon.atk}.")
         print()
-        if self.health > mon.health:
-            self.health -= mon.health
-            print("You win. Your health is now " + str(self.health) + ".")
+        if mon.kind != 'Friend':
+            self.health -= mon.atk
+        mon.health -= self.atk
+        print("You fight. Your health is now " + str(self.health) + ".")
+        if mon.kind == 'Friend':
+            print(f"{mon.name} doesn't fight back.")
+            print(f"{mon.name} is your friend.")
+        if mon.health <= 0:
+            print(f"You win! {mon.name} is now dead.")
+            if mon.kind == 'Friend':
+                print("Are you proud of yourself? Are you happy?")
+                print(f"All {mon.name} wanted was to be your friend.")
             mon.die()
         else:
+            print(f"{mon.name}'s health is now {mon.health}.")
+        if self.health <= 0:
             print("You lose.")
             self.alive = False
         print()

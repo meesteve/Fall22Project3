@@ -11,9 +11,9 @@ player = Player()
 def create_world():
     a = Room("You are in a weird hotel lobby")
     b = Room("You are on the first floor of a weird hotel.\nIt's green!")
-    c = Room("You are on the second floor of a weird hotel.\nIt's the color that you fail to see whenever you try to think up new colors!\nThe color could make Lovecraft less racist.")
+    c = Room("You are on the second floor of a weird hotel.\nIt's the color that you fail to see whenever you try to think up new colors!")
     d = Room("You are on the third floor of a weird hotel.\nIt's blue!")
-    e = Room("You are on the fourth floor of a weird hotel.\nIt's gay. Homosexual.")
+    e = Room("You are on the fourth floor of a weird hotel.\nIt's purple!")
     r = Room("You are on the roof of a weird hotel.\nYou look around you.\nThere is nothing that you can see.\nNothing at all.\nNo trees. No buildings. No stars.\nNo stars.\nNo stars.")
     hell = Room("You are in hell")
     Room.connect_rooms(a, "upstairs", b, "downstairs")
@@ -31,8 +31,10 @@ def create_world():
     f.put_in_room(d)
     player.location = a
     a.player = player
-    Monster("Bonkle donkle", 20, b)
-    Enemy("Johnny", 1, r)
+    Monster("Bonkle donkle", 20, 3, b)
+    Friend("Macaroni", 100, 1, b)
+    Enemy("Johnny", 1, 8, r)
+
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -173,6 +175,14 @@ if __name__ == "__main__":
                     target = player.location.get_monster_by_name(target_name)
                     if target != False:
                         player.attack_monster(target)
+                    else:
+                        print("No such monster.")
+                        command_success = False
+                case "pet":
+                    target_name = command[4:]
+                    target = player.location.get_monster_by_name(target_name)
+                    if target != False:
+                        player.pet_monster(target)
                     else:
                         print("No such monster.")
                         command_success = False
