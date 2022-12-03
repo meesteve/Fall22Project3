@@ -2,6 +2,7 @@ from room import *
 from player import *
 from item import *
 from creature import *
+from event import *
 import os
 import updater
 from fish import *
@@ -34,6 +35,7 @@ def create_world():
     Creature("Bonkle donkle", 20, 3, b)
     Friend("Macaroni", 100, 1, b)
     Enemy("Johnny", 1, 8, r)
+    Event(0.01, player)
 
 
 def clear():
@@ -62,13 +64,17 @@ def show_help():
     clear()
     print("go <direction> -- moves you in the given direction.")
     print("inventory -- opens your inventory.")
+    print("show -- displays your current status")
     print("pickup <item> -- picks up the item.")
     print("drop <item> -- drops the item.")
     print("drop all -- drops every item.")
     print("inspect <item> -- inspects the item.")
     print("sleep <item> -- lets you sleep on the item, if possible. regains life. dreams.")
     print("eat <item> -- lets you eat the item, if possible. regains life.")
-    print("open <item> -- lets you open the item, if possible.")
+    print("open <container> -- lets you open the container")
+    print("close <container> -- lets you close the container")
+    print("store <item> -- lets you store item in open container")
+    print("take <item> -- lets you take item from open container")
     print("wait <n> -- lets you sleep for n turns. if no n is given,\n            treats n as 1. does not regain life.")
     print("attack <creature> -- lets you attack the creature.")
     print("pet <creature> -- lets you pet the creature. may regain life.")
@@ -96,6 +102,8 @@ if __name__ == "__main__":
             if len(command_words) == 0:
                 continue
             match command_words[0].lower():
+                case "show":
+                    player.show()
                 case "go":   #cannot handle multi-word directions
                     okay = player.go_direction(command_words[1]) 
                     if okay:
@@ -164,18 +172,82 @@ if __name__ == "__main__":
                         print("No such item.")
                         command_success = False
                 case "open":
+                    clear()
                     target_name = command[5:]
                     target = player.location.get_item_by_name(target_name)
                     if target != False:
                         if target.kind == 'Container':
-                            target.open = True
-                            print(f"You've opened {target.name}")
+                            if target.open_up():
+                                print(f"You've opened {target.name}.")
+                            elif target.open:
+                                print(f"{target.name} is already open!")
+                            else:
+                                print(f"{target.name} is locked.")
                         else:
                             print("You can't open that!")
                             command_success = False
                     else:
                         print("No such item.")
                         command_success = False
+                    input("Press enter to continue...")
+                case "close":
+                    clear()
+                    target_name = command[6:]
+                    target = player.location.get_item_by_name(target_name)
+                    if target != False:
+                        if target.kind == 'Container':
+                            if target.close_up():
+                                print(f"You've closed {target.name}.")
+                            else:
+                                print(f"{target.name} is already closed!")
+                        else:
+                            print("You can't close that!")
+                            command_success = False
+                    else:
+                        print("No such item.")
+                        command_success = False
+                    input("Press enter to continue...")
+                case "store":
+                    target_name = command[6:]
+                    target = player.get_item_by_name(target_name)
+                    if target != False:
+                        for i in player.location.items:
+                            if i.kind == 'Container':
+                                if i.open:
+                                    player.drop(target, i)
+                                    clear()
+                                    print(f"You've stored {target.name} in {i.name}.")
+                                    print()
+                                    input("Press enter to continue...")
+                                    
+                        target = player.get_item_by_name(target_name)
+                        if target != False:
+                            print("No open container.")
+                            command_success = False
+                    else:
+                        print("No such item.")
+                        command_success = False
+                case "take":
+                    target_name = command[5:]
+                    box = None
+                    for i in player.location.items:
+                        if i.kind == 'Container':
+                            if i.open:
+                                box = i
+                    if box == None:
+                        print("No open container.")
+                        command_success = False
+                    else:
+                        target = box.get_item_by_name(target_name)
+                        if target != False:
+                            box.drop(target, player)
+                            clear()
+                            print(f"You take {target.name} from {box.name}.")
+                            print()
+                            input("Press enter to continue...")
+                        else:
+                            print("No such item.")
+                            command_success = False
                 case "inventory":
                     player.show_inventory()
                 case "help":

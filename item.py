@@ -45,10 +45,43 @@ class Container(Item):
         self.items = []
         self.open = False
 
-    def show_contents(self):
+    def open_up(self):
+        if self.open:
+            return False
+        self.open = True
+        return True
+    
+    def close_up(self):
+        if self.open:
+            self.open = False
+            return True
+        return False
+
+    def get_item_by_name(self, name):
+        for i in self.items:
+            if i.name.lower() == name.lower():
+                return i
+        return False
+
+    def drop(self, item, target = None):
+        target = target or self.loc
+        self.items.remove(item)
+        item.put_in_room(target)
+
+    def add_item(self, item):
+        self.items.append(item)
+    
+    def describe(self):
+        clear()
         print(self.desc)
+        if self.open:
+            self.show_contents()
+        else:
+            print("It's locked.")
+        input("Press enter to continue...")
+
+    def show_contents(self):
         print("It contains the following:")
         for i in self.items:
             print(i.name)
         print()
-        input("Press enter to continue...")

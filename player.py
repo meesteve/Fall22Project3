@@ -43,9 +43,10 @@ class Player:
         self.items.append(item)
         item.loc = self
         self.location.remove_item(item)
-    def drop(self, item):
+    def drop(self, item, target = None):
+        target = target or self.location
         self.items.remove(item)
-        item.put_in_room(self.location)
+        item.put_in_room(target)
     def drop_all(self):
         while self.items != []:
             self.drop(self.items[0])
@@ -85,6 +86,20 @@ class Player:
         else:
             print(f"{mon.name} is hating this. They are scared of you.")
         input("Press enter to continue...")
+    def show(self):
+        clear()
+        print("You sure have an appearance.")
+        print(f"You have a height for sure, a hair color certainly.\nCan't forget eyes.{' They are looking rather red.' if self.cry_count > 10 else ''} All the usual limbs.")
+        print(f"You have {self.health} health.")
+        print(f"You have {self.atk} attack.")
+        for c in self.location.creatures:
+            if c.kind == 'Friend':
+                print("You have a little friend!")
+                print(f"{c.name} is your friend!")
+        print()
+        input("Press enter to continue...")
+    def add_item(self, item):
+        self.items.append(item)
     def attack_creature(self, mon):
         clear()
         print("You are attacking " + mon.name)
