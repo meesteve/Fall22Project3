@@ -7,7 +7,7 @@ class Player:
     def __init__(self):
         self.location = None
         self.items = []
-        self.health = 50
+        self.health = 10000
         self.atk = 7
         self.alive = True
         self.cry_count = 0
@@ -47,9 +47,9 @@ class Player:
         target = target or self.location
         self.items.remove(item)
         item.put_in_room(target)
-    def drop_all(self):
+    def drop_all(self, target = None):
         while self.items != []:
-            self.drop(self.items[0])
+            self.drop(self.items[0], target)
     def gain_hp(self, hp):
         self.health += hp
     def eat(self, item):
@@ -71,8 +71,14 @@ class Player:
         clear()
         print("You are currently carrying:")
         print()
+        present = {}
         for i in self.items:
-            print(i.name)
+            if i.name in present.keys():
+                present[i.name] += 1
+            else:
+                present[i.name] = 1
+        for k in present.keys():
+            print(f"{k} x {present[k]}")
         print()
         input("Press enter to continue...")
     def pet_creature(self, mon):
@@ -96,37 +102,62 @@ class Player:
             if c.kind == 'Friend':
                 print("You have a little friend!")
                 print(f"{c.name} is your friend!")
+            else:
+                print("You are not alone.")
+                print(f"{c.name} is in the room with you.")
+        print(self.location.desc)
+        if self.items == []:
+            print("You have no items.")
+        else:
+            print("You have items in your inventory!")
+            print("You are currently carrying:")
+            for i in self.items:
+                print(i.name)
+        print(f"You have {self.atk} attack.")
+        if self.cry_count != 0:
+            print(f"You have cried {self.cry_count} time{'' if self.cry_count == 1 else 's'}.")
         print()
         input("Press enter to continue...")
     def add_item(self, item):
         self.items.append(item)
     def attack_creature(self, mon):
-        clear()
-        print("You are attacking " + mon.name)
-        print()
-        print("Your health is " + str(self.health) + ".")
-        print(f"Your attack is {self.atk}.")
-        print(mon.name + "'s health is " + str(mon.health) + ".")
-        print(f"{mon.name}'s attack is {mon.atk}.")
-        print()
-        if mon.kind != 'Friend':
-            self.health -= mon.atk
-        mon.health -= self.atk
-        print("You fight. Your health is now " + str(self.health) + ".")
-        if mon.kind == 'Friend':
-            print(f"{mon.name} doesn't fight back.")
-            print(f"{mon.name} is your friend.")
-        if mon.health <= 0:
-            print(f"You win! {mon.name} is now dead.")
+        for c in self.location.creatures:
+            if c.kind == 'Friend' and c != mon:
+                c.attack(mon)
+            if not mon.alive:
+                break
+        if mon.alive:
+            clear()
+            print("You are attacking " + mon.name)
+            print()
+            print("Your health is " + str(self.health) + ".")
+            print(f"Your attack is {self.atk}.")
+            print(mon.name + "'s health is " + str(mon.health) + ".")
+            print(f"{mon.name}'s attack is {mon.atk}.")
+            print()
+            if mon.kind != 'Friend':
+                self.health -= mon.atk
+            mon.health -= self.atk
+            print("You fight. Your health is now " + str(self.health) + ".")
             if mon.kind == 'Friend':
-                print("Are you proud of yourself? Are you happy?")
-                print(f"All {mon.name} wanted was to be your friend.")
-            mon.die()
-        else:
-            print(f"{mon.name}'s health is now {mon.health}.")
-        if self.health <= 0:
-            print("You lose.")
-            self.alive = False
+                print(f"{mon.name} doesn't fight back.")
+                print(f"{mon.name} is your friend.")
+            if mon.health <= 0:
+                print(f"You win! {mon.name} is now dead.")
+                if mon.kind == 'Friend':
+                    print("Are you proud of yourself? Are you happy?")
+                    print(f"All {mon.name} wanted was to be your friend.")
+                if mon.has_items():
+                    print(f"{mon.name} had items!")
+                    print("They drop the following items:")
+                    for i in mon.items:
+                        print(i.name)
+                mon.die()
+            else:
+                print(f"{mon.name}'s health is now {mon.health}.")
+            if self.health <= 0:
+                print("You lose.")
+                self.alive = False
         print()
         input("Press enter to continue...")
 

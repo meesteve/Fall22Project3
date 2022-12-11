@@ -44,3 +44,5 @@ class Room:
         return False
     def random_neighbor(self):
         return random.choice(self.exits)[1]
+    def random_item(self):
+        return random.choice(self.items)

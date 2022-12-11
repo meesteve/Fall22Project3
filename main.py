@@ -26,7 +26,7 @@ def create_world():
     i.put_in_room(b)
     bed = Bed("Bed", "Comfy, comfy bed. Go eep in the bed.")
     bed.put_in_room(a)
-    box = Container("Box", "Box on fire. Maybe you should sleep in the box.")
+    box = Container("Box", "Wet box. Sopping.")
     box.put_in_room(r)
     f = Food("Kronkle",'''This is kronkle, your favorite treat.\nYou remember when your grandmother would bake a kronkle for you.\n"Yonkle uhonkle!", she would say. "Ihonkle gonkle fonkle yonkle."\nYou hardly need her encouragement now.\nYou are overcome by a lust for the kronkle.''', 12)
     f.put_in_room(d)
@@ -36,6 +36,8 @@ def create_world():
     Friend("Macaroni", 100, 1, b)
     Enemy("Johnny", 1, 8, r)
     Event(0.01, player)
+    SpawnSlime(0.1, player, r)
+    SpawnNugget(0.2, player, e)
 
 
 def clear():
@@ -102,7 +104,7 @@ if __name__ == "__main__":
             if len(command_words) == 0:
                 continue
             match command_words[0].lower():
-                case "show":
+                case "me":
                     player.show()
                 case "go":   #cannot handle multi-word directions
                     okay = player.go_direction(command_words[1]) 
@@ -169,8 +171,16 @@ if __name__ == "__main__":
                             print("You can't eat that!")
                             command_success = False
                     else:
-                        print("No such item.")
-                        command_success = False
+                        target = player.get_item_by_name(target_name)
+                        if target != False:
+                            if target.kind == 'Food':
+                                player.eat(target)
+                            else:
+                                print("You can't eat that!")
+                                command_success = False
+                        else:
+                            print("No such item.")
+                            command_success = False
                 case "open":
                     clear()
                     target_name = command[5:]
@@ -262,6 +272,8 @@ if __name__ == "__main__":
                     player.asleep = True
                     for i in range(time):
                         updater.update_all()
+                        if not player.alive:
+                            break
                     player.asleep = False
                 case "exit":
                     playing = False
