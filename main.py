@@ -6,38 +6,52 @@ from event import *
 import os
 import updater
 from fish import *
+import random
 
 player = Player()
 
+def get_description(n):
+    num = (['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'eighteenth', 'nineteenth', 'twentieth'] + ['twenty-' + e for e in ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth']] + ['thirtieth'] + ['thirty-' + e for e in ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth']] + ['fortieth'])[n]
+    color = random.choice(['green', 'red', 'blue', 'purple', 'black', 'yellow', 'violet', 'indigo', 'white', 'teal', 'turquoise', 'pink', 'orange', 'grorple'])
+    animal = random.choice(['slimes', 'bears', 'trees', 'chickens'])
+    trait = random.choice([f'filled with sculptures of {animal}', f'covered with paintings of {animal}', f'filled with lamps shaped like {animal}', f'got a mural of {animal} painted on the ceiling', f'chock-full of christmas trees with ornaments shaped like {animal}'])
+    desc = f"You are on the {num} floor of a weird hotel. The walls are painted {color} and it's {trait}."
+    return desc
+
+
 def create_world():
     a = Room("You are in a weird hotel lobby")
-    b = Room("You are on the first floor of a weird hotel.\nIt's green!")
-    c = Room("You are on the second floor of a weird hotel.\nIt's the color that you fail to see whenever you try to think up new colors!")
-    d = Room("You are on the third floor of a weird hotel.\nIt's blue!")
-    e = Room("You are on the fourth floor of a weird hotel.\nIt's purple!")
     r = Room("You are on the roof of a weird hotel.\nYou look around you.\nThere is nothing that you can see.\nNothing at all.\nNo trees. No buildings. No stars.\nNo stars.\nNo stars.")
-    hell = Room("You are in hell")
-    Room.connect_rooms(a, "upstairs", b, "downstairs")
-    Room.connect_rooms(b, "upstairs", c, "downstairs")
-    Room.connect_rooms(c, "upstairs", d, "downstairs")
-    Room.connect_rooms(d, "upstairs", e, "downstairs")
-    Room.connect_rooms(e, "upstairs", r, "downstairs")
+    n_floors = sum([random.randint(1,4) for i in range(5)])
+    floors = [Room(get_description(i)) for i in range(n_floors)]
+    Room.connect_rooms(a, "upstairs", floors[0], "downstairs")
+    for i in range(len(floors) - 1):
+        Room.connect_rooms(floors[i], "upstairs", floors[i+1], "downstairs")
+    Room.connect_rooms(floors[-1], "upstairs", r, "downstairs")
     i = Item("Note", "This is a note. You can't read what it says.\nFun fact! This is because you can't read.")
-    i.put_in_room(b)
-    bed = Bed("Bed", "Comfy, comfy bed. Go eep in the bed.")
-    bed.put_in_room(a)
-    box = Container("Box", "Wet box. Sopping.")
-    box.put_in_room(r)
+    i.put_in_room(random.choice(floors))
     f = Food("Kronkle",'''This is kronkle, your favorite treat.\nYou remember when your grandmother would bake a kronkle for you.\n"Yonkle uhonkle!", she would say. "Ihonkle gonkle fonkle yonkle."\nYou hardly need her encouragement now.\nYou are overcome by a lust for the kronkle.''', 12)
-    f.put_in_room(d)
+    f.put_in_room(random.choice(floors))
     player.location = a
     a.player = player
-    Creature("Bonkle donkle", 20, 3, b)
-    Friend("Macaroni", 100, 1, b)
-    Enemy("Johnny", 1, 8, r)
+    Creature("Bonkle donkle", 20, 3, random.choice(floors))
+    Friend("Macaroni", 100, 1, random.choice(floors))
+    Enemy("Johnny", 1, 8, random.choice(floors))
     Event(0.01, player)
-    SpawnSlime(0.1, player, r)
-    SpawnNugget(0.2, player, e)
+    Win(1, player, r, True)
+    for f in range(len(floors)):
+        temp_room = floors[f]
+        if 'slime' in temp_room.desc:
+            SpawnSlime(0.1, player, temp_room)
+        if 'bear' in temp_room.desc:
+            SpawnBear(0.1, player, temp_room)
+        if 'chicken' in temp_room.desc:
+            SpawnChicken(0.1, player, temp_room)
+        SpawnNugget(0.2, player, temp_room)
+        Bed("Bed", "Comfy, comfy bed. Go eep in the bed.").put_in_room(temp_room)
+        Container("Box", "Wet box. Sopping.").put_in_room(temp_room)
+
+
 
 
 def clear():
@@ -54,8 +68,14 @@ def print_situation():
         print()
     if player.location.has_items():
         print("This room contains the following items:")
+        present = {}
         for i in player.location.items:
-            print(i.name)
+            if i.name in present.keys():
+                present[i.name] += 1
+            else:
+                present[i.name] = 1
+        for k in present.keys():
+            print(f"{k} x {present[k]}")
         print()
     print("You can go in the following directions:")
     for e in player.location.exit_names():
@@ -64,8 +84,9 @@ def print_situation():
 
 def show_help():
     clear()
+    print("This is a game in which the object is to get to the roof, with as much gold as possible.\nYou win the game if you have more than 1000 gold.\nYou get gold by killing monsters.\nGood luck!\n\nControls:")
     print("go <direction> -- moves you in the given direction.")
-    print("inventory -- opens your inventory.")
+    print("inventory -- displays your inventory.")
     print("show -- displays your current status")
     print("pickup <item> -- picks up the item.")
     print("drop <item> -- drops the item.")
@@ -107,7 +128,10 @@ if __name__ == "__main__":
                 case "me":
                     player.show()
                 case "go":   #cannot handle multi-word directions
-                    okay = player.go_direction(command_words[1]) 
+                    if len(command_words) > 1:
+                        okay = player.go_direction(command_words[1]) 
+                    else:
+                        okay = False
                     if okay:
                         time_passes = True
                     else:
@@ -137,6 +161,8 @@ if __name__ == "__main__":
                     target = player.get_item_by_name(target_name)
                     if target == False:
                         target = player.location.get_item_by_name(target_name)
+                    if target == False:
+                        target = player.location.get_creature_by_name(target_name)
                     if target != False:
                         target.describe()
                     else:
@@ -182,11 +208,11 @@ if __name__ == "__main__":
                             print("No such item.")
                             command_success = False
                 case "open":
-                    clear()
                     target_name = command[5:]
                     target = player.location.get_item_by_name(target_name)
                     if target != False:
                         if target.kind == 'Container':
+                            clear()
                             if target.open_up():
                                 print(f"You've opened {target.name}.")
                             elif target.open:
@@ -201,11 +227,11 @@ if __name__ == "__main__":
                         command_success = False
                     input("Press enter to continue...")
                 case "close":
-                    clear()
                     target_name = command[6:]
                     target = player.location.get_item_by_name(target_name)
                     if target != False:
                         if target.kind == 'Container':
+                            clear()
                             if target.close_up():
                                 print(f"You've closed {target.name}.")
                             else:

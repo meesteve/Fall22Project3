@@ -67,6 +67,12 @@ class Player:
             if i.name.lower() == name.lower():
                 return i
         return False
+    def count_gold(self):
+        ret = 0
+        for i in self.items:
+            if i.kind == 'Gold':
+                ret += 1
+        return ret
     def show_inventory(self):
         clear()
         print("You are currently carrying:")
@@ -98,6 +104,9 @@ class Player:
         print(f"You have a height for sure, a hair color certainly.\nCan't forget eyes.{' They are looking rather red.' if self.cry_count > 10 else ''} All the usual limbs.")
         print(f"You have {self.health} health.")
         print(f"You have {self.atk} attack.")
+        print()
+        input("Press enter to continue...")
+        clear()
         for c in self.location.creatures:
             if c.kind == 'Friend':
                 print("You have a little friend!")
@@ -105,14 +114,23 @@ class Player:
             else:
                 print("You are not alone.")
                 print(f"{c.name} is in the room with you.")
+        print()
+        input('Press enter to continue...')
+        clear()
         print(self.location.desc)
         if self.items == []:
             print("You have no items.")
         else:
             print("You have items in your inventory!")
             print("You are currently carrying:")
+            present = {}
             for i in self.items:
-                print(i.name)
+                if i.name in present.keys():
+                    present[i.name] += 1
+                else:
+                    present[i.name] = 1
+            for k in present.keys():
+                print(f"{k} x {present[k]}")
         print(f"You have {self.atk} attack.")
         if self.cry_count != 0:
             print(f"You have cried {self.cry_count} time{'' if self.cry_count == 1 else 's'}.")
@@ -150,8 +168,14 @@ class Player:
                 if mon.has_items():
                     print(f"{mon.name} had items!")
                     print("They drop the following items:")
+                    present = {}
                     for i in mon.items:
-                        print(i.name)
+                        if i.name in present.keys():
+                            present[i.name] += 1
+                        else:
+                            present[i.name] = 1
+                    for k in present.keys():
+                        print(f"{k} x {present[k]}")
                 mon.die()
             else:
                 print(f"{mon.name}'s health is now {mon.health}.")

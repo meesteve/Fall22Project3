@@ -1,13 +1,30 @@
 import random
 import updater
 import os
+from item import *
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
+def num_to_name(n):
+    vowels = ['a', 'e', 'i', 'o', 'u']
+    consonants = ['p', 't', 'k', 'b', 'gl', 'd', 'w', 'y', 's', 'f', 'j', 'l', 'z', 'x', 'c', 'v', 'n', 'm', 'st', 'gr', 'br', 'bl']
+    syll = [c + v for c in consonants for v in vowels]
+    b = len(syll)
+    ret = ''
+    while n != 0:
+        ret += syll[n%b]
+        n //= b
+    if len(ret) != 0:
+        ret = ret[0].upper() + ret[1:]
+    return ret
+
+
 class Creature:
+    number = 0
     def __init__(self, name, health, attack, room):
-        self.name = name
+        Creature.number += 1
+        self.name = num_to_name(Creature.number) + ' the ' + name
         self.health = health
         self.room = room
         self.atk = attack
@@ -16,6 +33,24 @@ class Creature:
         updater.register(self)
         self.kind = 'Neutral'
         self.items = []
+    def describe(self):
+        clear()
+        print(self.name)
+        if self.items == []:
+            print("They are not carrying any items.")
+        else:
+            print(f"{self.name} is currently carrying:")
+            print()
+            present = {}
+            for i in self.items:
+                if i.name in present.keys():
+                    present[i.name] += 1
+                else:
+                    present[i.name] = 1
+            for k in present.keys():
+                print(f"{k} x {present[k]}")
+        print()
+        input("Press enter to continue...")
     def pickup(self, item):
         self.items.append(item)
         item.loc = self
@@ -38,8 +73,14 @@ class Creature:
         clear()
         print(f"{self.name} is currently carrying:")
         print()
+        present = {}
         for i in self.items:
-            print(i.name)
+            if i.name in present.keys():
+                present[i.name] += 1
+            else:
+                present[i.name] = 1
+        for k in present.keys():
+            print(f"{k} x {present[k]}")
         print()
         input("Press enter to continue...")
     def add_item(self, item):
@@ -63,6 +104,7 @@ class Enemy(Creature):
     def __init__(self, name, health, attack, room):
         super().__init__(name, health, attack, room)
         self.kind = 'Enemy'
+        self.items = [Gold("Gold", "Hunk of gold.") for _ in range(10)]
     
     def update(self):
         if self.room.player != False:
@@ -93,8 +135,14 @@ class Enemy(Creature):
             if mon.has_items():
                 print(f"{mon.name} had items!")
                 print("They drop the following items:")
+                present = {}
                 for i in mon.items:
-                    print(i.name)
+                    if i.name in present.keys():
+                        present[i.name] += 1
+                    else:
+                        present[i.name] = 1
+                for k in present.keys():
+                    print(f"{k} x {present[k]}")
             mon.die()
         else:
             print(f"{mon.name}'s health is now {mon.health}.")
@@ -141,9 +189,15 @@ class Friend(Creature):
             if self.has_items():
                 print(f"{self.name} had items!")
                 print("They drop the following items:")
+                present = {}
                 for i in self.items:
-                    print(i.name)
+                    if i.name in present.keys():
+                        present[i.name] += 1
+                    else:
+                        present[i.name] = 1
                     self.drop(i, mon)
+                for k in present.keys():
+                    print(f"{k} x {present[k]}")
             self.die()
         else:
             print(f"{self.name}'s health is now {self.health}")
@@ -152,8 +206,14 @@ class Friend(Creature):
             if mon.has_items():
                 print(f"{mon.name} had items!")
                 print("They drop the following items:")
+                present = {}
                 for i in mon.items:
-                    print(i.name)
+                    if i.name in present.keys():
+                        present[i.name] += 1
+                    else:
+                        present[i.name] = 1
+                for k in present.keys():
+                    print(f"{k} x {present[k]}")
             mon.die()
         else:
             print(f"{mon.name}'s health is now {mon.health}.")

@@ -19,6 +19,11 @@ class Item:
         self.loc = room
         room.add_item(self)
 
+class Gold(Item):
+    def __init__(self, name, desc):
+        super().__init__(name, desc)
+        self.kind = 'Gold'
+
 class Bed(Item):
     def __init__(self, name, desc):
         super().__init__(name, desc)
@@ -82,6 +87,12 @@ class Container(Item):
 
     def show_contents(self):
         print("It contains the following:")
+        present = {}
         for i in self.items:
-            print(i.name)
+            if i.name in present.keys():
+                present[i.name] += 1
+            else:
+                present[i.name] = 1
+        for k in present.keys():
+            print(f"{k} x {present[k]}")
         print()
