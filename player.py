@@ -7,7 +7,7 @@ class Player:
     def __init__(self):
         self.location = None
         self.items = []
-        self.health = 10000
+        self.health = 400
         self.atk = 7
         self.alive = True
         self.cry_count = 0

@@ -45,7 +45,7 @@ class SpawnSlime(Event):
     def happen(self):
         rand = random.random()
         if rand < .7:
-            Creature("Green Slime", 20, 10, self.room)
+            Creature("Green Slime", 30, 10, self.room)
         elif rand < .8:
             Enemy("Red Slime", 30, 10, self.room)
         else:
@@ -87,11 +87,11 @@ class SpawnBear(Event):
     def happen(self):
         rand = random.random()
         if rand < .7:
-            Creature("Normal Bear", 40, 40, self.room)
+            Creature("Normal Bear", 20, 20, self.room)
         elif rand < .8:
-            Enemy("Mean Bear", 40, 40, self.room)
+            Enemy("Mean Bear", 20, 20, self.room)
         else:
-            Friend("Nice Bear", 40, 40, self.room)
+            Friend("Nice Bear", 20, 20, self.room)
         if self.room.player != False:
             clear()
             print("A bear has appeared!")
@@ -115,7 +115,7 @@ class SpawnNugget(Event):
 
 class Win(Event):
     def happen(self):
-        if self.player.count_gold() >= 1000:
+        if self.player.count_gold() >= 500:
             self.player.alive = False
             clear()
             print("You win the game!")

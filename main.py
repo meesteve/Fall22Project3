@@ -84,7 +84,7 @@ def print_situation():
 
 def show_help():
     clear()
-    print("This is a game in which the object is to get to the roof, with as much gold as possible.\nYou win the game if you have more than 1000 gold.\nYou get gold by killing monsters.\nGood luck!\n\nControls:")
+    print("This is a game in which the object is to get to the roof, with as much gold as possible.\nYou win the game if you have more than 500 gold.\nYou get gold by killing monsters.\nGood luck!\n\nControls:")
     print("go <direction> -- moves you in the given direction.")
     print("inventory -- displays your inventory.")
     print("show -- displays your current status")
