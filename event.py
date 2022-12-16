@@ -6,7 +6,7 @@ from item import *
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
-
+# event
 class Event:
     def __init__(self, odds, player, room = None, player_needed = False):
         self.odds = odds # number between 0 and 1, probability of occurence
@@ -14,7 +14,7 @@ class Event:
         self.player = player
         self.player_needed = player_needed
         updater.register(self)
-    
+    # updates event if less than odds
     def update(self):
         if self.room != None:
             if self.player_needed:
@@ -27,7 +27,7 @@ class Event:
         else:
             if random.random() < self.odds:
                 self.happen()
-    
+    # actual thing that happens
     def happen(self): # this should be edited in other kinds of classes
         clear()
         print("You hear voices down the corridor.")
@@ -40,16 +40,17 @@ class Event:
         print('''"You can find it here."''')
         print()
         input("Press enter to continue...")
-
+# specific event that spawns slimes
 class SpawnSlime(Event):
+    # spawns slime, can be of type friend, enemy, or neutral
     def happen(self):
         rand = random.random()
         if rand < .7:
-            Creature("Green Slime", 30, 10, self.room)
+            Creature("Green Slime", 60, 5, self.room)
         elif rand < .8:
-            Enemy("Red Slime", 30, 10, self.room)
+            Enemy("Red Slime", 60, 5, self.room)
         else:
-            Friend("Blue Slime", 30, 10, self.room)
+            Friend("Blue Slime", 80, 5, self.room)
         if self.room.player != False:
             clear()
             print("A slime has appeared!")
@@ -61,16 +62,17 @@ class SpawnSlime(Event):
                 print("The slime is blue. You can't tell what it's thinking.")
             print()
             input("Press enter to continue...")
-
+# specific event that spawns chicken
 class SpawnChicken(Event):
+    # spawns chicken, can be of type friend, enemy, or neutral
     def happen(self):
         rand = random.random()
         if rand < .7:
-            Creature("Speckled Chicken", 10, 30, self.room)
+            Creature("Speckled Chicken", 20, 15, self.room)
         elif rand < .8:
-            Enemy("Orpington Chicken", 10, 30, self.room)
+            Enemy("Orpington Chicken", 20, 15, self.room)
         else:
-            Friend("Andalusian Chicken", 10, 30, self.room)
+            Friend("Andalusian Chicken", 40, 15, self.room)
         if self.room.player != False:
             clear()
             print("A chicken has appeared!")
@@ -82,16 +84,17 @@ class SpawnChicken(Event):
                 print("It's an andalusian chicken! It runs up to you and cuddles you!")
             print()
             input("Press enter to continue...")
-
+# specific event that spawns bears
 class SpawnBear(Event):
+    # spawns bear, can be of type friend, enemy, or neutral
     def happen(self):
         rand = random.random()
         if rand < .7:
-            Creature("Normal Bear", 20, 20, self.room)
+            Creature("Normal Bear", 40, 10, self.room)
         elif rand < .8:
-            Enemy("Mean Bear", 20, 20, self.room)
+            Enemy("Mean Bear", 40, 10, self.room)
         else:
-            Friend("Nice Bear", 20, 20, self.room)
+            Friend("Nice Bear", 60, 10, self.room)
         if self.room.player != False:
             clear()
             print("A bear has appeared!")
@@ -103,7 +106,7 @@ class SpawnBear(Event):
                 print("It's a nice bear. It will help you fight.")
             print()
             input("Press enter to continue...")
-
+# spawns nuggets
 class SpawnNugget(Event):
     def happen(self):
         rand = random.random()
@@ -112,7 +115,7 @@ class SpawnNugget(Event):
         else:
             i = Gold("Gold", "Gold nugget. You can't eat the nugget. Wrong kind.")
         i.put_in_room(self.room)
-
+# wins the game
 class Win(Event):
     def happen(self):
         if self.player.count_gold() >= 500:

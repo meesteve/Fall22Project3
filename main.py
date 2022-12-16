@@ -9,7 +9,7 @@ from fish import *
 import random
 
 player = Player()
-
+# generates room
 def get_description(n):
     num = (['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'eighteenth', 'nineteenth', 'twentieth'] + ['twenty-' + e for e in ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth']] + ['thirtieth'] + ['thirty-' + e for e in ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth']] + ['fortieth'])[n]
     color = random.choice(['green', 'red', 'blue', 'purple', 'black', 'yellow', 'violet', 'indigo', 'white', 'teal', 'turquoise', 'pink', 'orange', 'grorple'])
@@ -18,7 +18,7 @@ def get_description(n):
     desc = f"You are on the {num} floor of a weird hotel. The walls are painted {color} and it's {trait}."
     return desc
 
-
+# creates world
 def create_world():
     a = Room("You are in a weird hotel lobby")
     r = Room("You are on the roof of a weird hotel.\nYou look around you.\nThere is nothing that you can see.\nNothing at all.\nNo trees. No buildings. No stars.\nNo stars.\nNo stars.")
@@ -35,8 +35,7 @@ def create_world():
     player.location = a
     a.player = player
     Creature("Bonkle donkle", 20, 3, random.choice(floors))
-    Friend("Macaroni", 100, 1, random.choice(floors))
-    Enemy("Johnny", 1, 8, random.choice(floors))
+    Friend("Macaroni", 10000, 1, random.choice(floors))
     Event(0.01, player)
     Win(1, player, r, True)
     for f in range(len(floors)):
@@ -140,6 +139,16 @@ if __name__ == "__main__":
                 case "pickup":  #can handle multi-word objects
                     target_name = command[7:] # everything after "pickup "
                     target = player.location.get_item_by_name(target_name)
+                    if target == False:
+                        for c in player.location.creatures:
+                            if c.kind == 'Friend':
+                                target = c.get_item_by_name(target_name)
+                                if target != False:
+                                    print(f"{c.name} has {target_name}!")
+                                    print("They give it to you.")
+                                    print()
+                                    input("Press enter to continue...")
+                                    break
                     if target != False:
                         player.pickup(target)
                     else:

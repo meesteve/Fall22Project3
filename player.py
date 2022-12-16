@@ -12,8 +12,7 @@ class Player:
         self.alive = True
         self.cry_count = 0
         self.asleep = False
-    # goes in specified direction if possible, returns True
-    # if not possible returns False
+    # cries
     def cry(self):
         self.cry_count += 1
         clear()
@@ -31,6 +30,8 @@ class Player:
             self.alive = False
         print()
         input("Press enter to continue...")
+    # goes in specified direction if possible, returns True
+    # if not possible returns False
     def go_direction(self, direction):
         new_location = self.location.get_destination(direction.lower())
         if new_location is not None:
@@ -39,19 +40,27 @@ class Player:
             self.location.player = self
             return True
         return False
+    # picks up specified item
     def pickup(self, item):
         self.items.append(item)
+        item.loc.items.remove(item)
         item.loc = self
-        self.location.remove_item(item)
+    # drops specified item
     def drop(self, item, target = None):
         target = target or self.location
         self.items.remove(item)
         item.put_in_room(target)
+    # removes item from inventory
+    def remove_item(self, item):
+        self.drop(item, None)
+    # drops all items
     def drop_all(self, target = None):
         while self.items != []:
             self.drop(self.items[0], target)
+    # gains hp
     def gain_hp(self, hp):
         self.health += hp
+    # eats specified item
     def eat(self, item):
         self.health += item.nv
         if item in self.items:
@@ -62,17 +71,21 @@ class Player:
         print(f"You slurp {item.name} up. Slurpity slurp slurp slurp. Sluuuurrrrrrp. Fuck, that tastes {'good' if item.nv > 0 else 'awful'}. Who knows where it goes.")
         print()
         input("Press enter to continue...")
+    # returns item, identified by name
+    # if item not found, returns false
     def get_item_by_name(self, name):
         for i in self.items:
             if i.name.lower() == name.lower():
                 return i
         return False
+    # returns a total of the number of gold in inventory
     def count_gold(self):
         ret = 0
         for i in self.items:
             if i.kind == 'Gold':
                 ret += 1
         return ret
+    # displays inventory
     def show_inventory(self):
         clear()
         print("You are currently carrying:")
@@ -87,6 +100,7 @@ class Player:
             print(f"{k} x {present[k]}")
         print()
         input("Press enter to continue...")
+    # pets creature
     def pet_creature(self, mon):
         clear()
         print(f"You are petting {mon.name}")
@@ -98,6 +112,7 @@ class Player:
         else:
             print(f"{mon.name} is hating this. They are scared of you.")
         input("Press enter to continue...")
+    # prints a description of self
     def show(self):
         clear()
         print("You sure have an appearance.")
@@ -136,8 +151,12 @@ class Player:
             print(f"You have cried {self.cry_count} time{'' if self.cry_count == 1 else 's'}.")
         print()
         input("Press enter to continue...")
+    # adds item to the inventory
     def add_item(self, item):
         self.items.append(item)
+    # attacks specified creature
+    # before attacking the creature, every 'friend' creature also attacks specified creature
+    # 'attacking' is subtracting self's attack from target's hp, and vice versa
     def attack_creature(self, mon):
         for c in self.location.creatures:
             if c.kind == 'Friend' and c != mon:
