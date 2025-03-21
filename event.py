@@ -1,8 +1,8 @@
 import os
 import updater
-from random import *
-from creature import *
-from item import *
+import random
+import creature
+import item
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -16,7 +16,7 @@ class Event:
         updater.register(self)
     # updates event if less than odds
     def update(self):
-        if self.room != None:
+        if self.room is not None:
             if self.player_needed:
                 if self.player.location == self.room:
                     if random.random() < self.odds:
@@ -46,12 +46,12 @@ class SpawnSlime(Event):
     def happen(self):
         rand = random.random()
         if rand < .7:
-            Creature("Green Slime", 60, 5, self.room)
+            creature.Creature("Green Slime", 60, 5, self.room)
         elif rand < .8:
-            Enemy("Red Slime", 60, 5, self.room)
+            creature.Enemy("Red Slime", 60, 5, self.room)
         else:
-            Friend("Blue Slime", 80, 5, self.room)
-        if self.room.player != False:
+            creature.Friend("Blue Slime", 80, 5, self.room)
+        if self.room.player:
             clear()
             print("A slime has appeared!")
             if rand < .7:
@@ -68,12 +68,12 @@ class SpawnChicken(Event):
     def happen(self):
         rand = random.random()
         if rand < .7:
-            Creature("Speckled Chicken", 20, 15, self.room)
+            creature.Creature("Speckled Chicken", 20, 15, self.room)
         elif rand < .8:
-            Enemy("Orpington Chicken", 20, 15, self.room)
+            creature.Enemy("Orpington Chicken", 20, 15, self.room)
         else:
-            Friend("Andalusian Chicken", 40, 15, self.room)
-        if self.room.player != False:
+            creature.Friend("Andalusian Chicken", 40, 15, self.room)
+        if self.room.player:
             clear()
             print("A chicken has appeared!")
             if rand < .7:
@@ -90,12 +90,12 @@ class SpawnBear(Event):
     def happen(self):
         rand = random.random()
         if rand < .7:
-            Creature("Normal Bear", 40, 10, self.room)
+            creature.Creature("Normal Bear", 40, 10, self.room)
         elif rand < .8:
-            Enemy("Mean Bear", 40, 10, self.room)
+            creature.Enemy("Mean Bear", 40, 10, self.room)
         else:
-            Friend("Nice Bear", 60, 10, self.room)
-        if self.room.player != False:
+            creature.Friend("Nice Bear", 60, 10, self.room)
+        if self.room.player:
             clear()
             print("A bear has appeared!")
             if rand < .7:
@@ -111,9 +111,9 @@ class SpawnNugget(Event):
     def happen(self):
         rand = random.random()
         if rand < .9:
-            i = Food("Chicken Nugget", "Chicken Nugget. You can eat this nugget! yumpy.", 8)
+            i = item.Food("Chicken Nugget", "Chicken Nugget. You can eat this nugget! yumpy.", 8)
         else:
-            i = Gold("Gold", "Gold nugget. You can't eat the nugget. Wrong kind.")
+            i = item.Gold("Gold", "Gold nugget. You can't eat the nugget. Wrong kind.")
         i.put_in_room(self.room)
 # wins the game
 class Win(Event):

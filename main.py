@@ -1,14 +1,14 @@
-from room import *
-from player import *
-from item import *
-from creature import *
-from event import *
+import room
+import player
+import item
+import creature
+import event
 import os
 import updater
-from fish import *
+import fish
 import random
 
-player = Player()
+player = player.Player()
 # generates room
 def get_description(n):
     num = (['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth', 'tenth', 'eleventh', 'twelfth', 'thirteenth', 'fourteenth', 'fifteenth', 'sixteenth', 'eighteenth', 'nineteenth', 'twentieth'] + ['twenty-' + e for e in ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth']] + ['thirtieth'] + ['thirty-' + e for e in ['first', 'second', 'third', 'fourth', 'fifth', 'sixth', 'seventh', 'eighth', 'ninth']] + ['fortieth'])[n]
@@ -20,35 +20,35 @@ def get_description(n):
 
 # creates world
 def create_world():
-    a = Room("You are in a weird hotel lobby")
-    r = Room("You are on the roof of a weird hotel.\nYou look around you.\nThere is nothing that you can see.\nNothing at all.\nNo trees. No buildings. No stars.\nNo stars.\nNo stars.")
+    a = room.Room("You are in a weird hotel lobby")
+    r = room.Room("You are on the roof of a weird hotel.\nYou look around you.\nThere is nothing that you can see.\nNothing at all.\nNo trees. No buildings. No stars.\nNo stars.\nNo stars.")
     n_floors = sum([random.randint(1,4) for i in range(5)])
-    floors = [Room(get_description(i)) for i in range(n_floors)]
-    Room.connect_rooms(a, "upstairs", floors[0], "downstairs")
+    floors = [room.Room(get_description(i)) for i in range(n_floors)]
+    room.Room.connect_rooms(a, "upstairs", floors[0], "downstairs")
     for i in range(len(floors) - 1):
-        Room.connect_rooms(floors[i], "upstairs", floors[i+1], "downstairs")
-    Room.connect_rooms(floors[-1], "upstairs", r, "downstairs")
-    i = Item("Note", "This is a note. You can't read what it says.\nFun fact! This is because you can't read.")
+        room.Room.connect_rooms(floors[i], "upstairs", floors[i+1], "downstairs")
+    room.Room.connect_rooms(floors[-1], "upstairs", r, "downstairs")
+    i = item.Item("Note", "This is a note. You can't read what it says.\nFun fact! This is because you can't read.")
     i.put_in_room(random.choice(floors))
-    f = Food("Kronkle",'''This is kronkle, your favorite treat.\nYou remember when your grandmother would bake a kronkle for you.\n"Yonkle uhonkle!", she would say. "Ihonkle gonkle fonkle yonkle."\nYou hardly need her encouragement now.\nYou are overcome by a lust for the kronkle.''', 12)
+    f = item.Food("Kronkle",'''This is kronkle, your favorite treat.\nYou remember when your grandmother would bake a kronkle for you.\n"Yonkle uhonkle!", she would say. "Ihonkle gonkle fonkle yonkle."\nYou hardly need her encouragement now.\nYou are overcome by a lust for the kronkle.''', 12)
     f.put_in_room(random.choice(floors))
     player.location = a
     a.player = player
-    Creature("Bonkle donkle", 20, 3, random.choice(floors))
-    Friend("Macaroni", 10000, 1, random.choice(floors))
-    Event(0.01, player)
-    Win(1, player, r, True)
+    creature.Creature("Bonkle donkle", 20, 3, random.choice(floors))
+    creature.Friend("Macaroni", 10000, 1, random.choice(floors))
+    event.Event(0.01, player)
+    event.Win(1, player, r, True)
     for f in range(len(floors)):
         temp_room = floors[f]
         if 'slime' in temp_room.desc:
-            SpawnSlime(0.1, player, temp_room)
+            event.SpawnSlime(0.1, player, temp_room)
         if 'bear' in temp_room.desc:
-            SpawnBear(0.1, player, temp_room)
+            event.SpawnBear(0.1, player, temp_room)
         if 'chicken' in temp_room.desc:
-            SpawnChicken(0.1, player, temp_room)
-        SpawnNugget(0.2, player, temp_room)
-        Bed("Bed", "Comfy, comfy bed. Go eep in the bed.").put_in_room(temp_room)
-        Container("Box", "Wet box. Sopping.").put_in_room(temp_room)
+            event.SpawnChicken(0.1, player, temp_room)
+        event.SpawnNugget(0.2, player, temp_room)
+        item.Bed("Bed", "Comfy, comfy bed. Go eep in the bed.").put_in_room(temp_room)
+        item.Container("Box", "Wet box. Sopping.").put_in_room(temp_room)
 
 
 
@@ -139,17 +139,17 @@ if __name__ == "__main__":
                 case "pickup":  #can handle multi-word objects
                     target_name = command[7:] # everything after "pickup "
                     target = player.location.get_item_by_name(target_name)
-                    if target == False:
+                    if not target:
                         for c in player.location.creatures:
                             if c.kind == 'Friend':
                                 target = c.get_item_by_name(target_name)
-                                if target != False:
+                                if target:
                                     print(f"{c.name} has {target_name}!")
                                     print("They give it to you.")
                                     print()
                                     input("Press enter to continue...")
                                     break
-                    if target != False:
+                    if target:
                         player.pickup(target)
                     else:
                         print("No such item.")
@@ -160,7 +160,7 @@ if __name__ == "__main__":
                         player.drop_all()
                     else:
                         target = player.get_item_by_name(target_name)
-                        if target != False:
+                        if target:
                             player.drop(target)
                         else:
                             print("No such item.")
@@ -168,11 +168,11 @@ if __name__ == "__main__":
                 case "inspect":
                     target_name = command[8:]
                     target = player.get_item_by_name(target_name)
-                    if target == False:
+                    if not target:
                         target = player.location.get_item_by_name(target_name)
-                    if target == False:
+                    if not target:
                         target = player.location.get_creature_by_name(target_name)
-                    if target != False:
+                    if target:
                         target.describe()
                     else:
                         print("No such item.")
@@ -180,12 +180,12 @@ if __name__ == "__main__":
                 case "sleep":
                     target_name = command[6:]
                     target = player.location.get_item_by_name(target_name)
-                    if target != False:
+                    if target:
                         if target.kind == 'Bed':
                             clear()
                             print("You fall into a dream.")
                             input("Press enter to continue...")
-                            fish_game()
+                            fish.fish_game()
                             input("Press enter to continue...")
                             target.sleep(player)
                             for _ in range(3):
@@ -199,7 +199,7 @@ if __name__ == "__main__":
                 case "eat":
                     target_name = command[4:]
                     target = player.location.get_item_by_name(target_name)
-                    if target != False:
+                    if target:
                         if target.kind == 'Food':
                             player.eat(target)
                         else:
@@ -207,7 +207,7 @@ if __name__ == "__main__":
                             command_success = False
                     else:
                         target = player.get_item_by_name(target_name)
-                        if target != False:
+                        if target:
                             if target.kind == 'Food':
                                 player.eat(target)
                             else:
@@ -219,7 +219,7 @@ if __name__ == "__main__":
                 case "open":
                     target_name = command[5:]
                     target = player.location.get_item_by_name(target_name)
-                    if target != False:
+                    if target:
                         if target.kind == 'Container':
                             clear()
                             if target.open_up():
@@ -238,7 +238,7 @@ if __name__ == "__main__":
                 case "close":
                     target_name = command[6:]
                     target = player.location.get_item_by_name(target_name)
-                    if target != False:
+                    if target:
                         if target.kind == 'Container':
                             clear()
                             if target.close_up():
@@ -255,7 +255,7 @@ if __name__ == "__main__":
                 case "store":
                     target_name = command[6:]
                     target = player.get_item_by_name(target_name)
-                    if target != False:
+                    if target:
                         for i in player.location.items:
                             if i.kind == 'Container':
                                 if i.open:
@@ -266,7 +266,7 @@ if __name__ == "__main__":
                                     input("Press enter to continue...")
                                     
                         target = player.get_item_by_name(target_name)
-                        if target != False:
+                        if target:
                             print("No open container.")
                             command_success = False
                     else:
@@ -279,12 +279,12 @@ if __name__ == "__main__":
                         if i.kind == 'Container':
                             if i.open:
                                 box = i
-                    if box == None:
+                    if box is None:
                         print("No open container.")
                         command_success = False
                     else:
                         target = box.get_item_by_name(target_name)
-                        if target != False:
+                        if target:
                             box.drop(target, player)
                             clear()
                             print(f"You take {target.name} from {box.name}.")
@@ -315,7 +315,7 @@ if __name__ == "__main__":
                 case "attack":
                     target_name = command[7:]
                     target = player.location.get_creature_by_name(target_name)
-                    if target != False:
+                    if target:
                         player.attack_creature(target)
                     else:
                         print("No such creature.")
@@ -323,7 +323,7 @@ if __name__ == "__main__":
                 case "pet":
                     target_name = command[4:]
                     target = player.location.get_creature_by_name(target_name)
-                    if target != False:
+                    if target:
                         player.pet_creature(target)
                     else:
                         print("No such creature.")
@@ -333,7 +333,7 @@ if __name__ == "__main__":
                 case other:
                     print("Not a valid command")
                     command_success = False
-        if time_passes == True:
+        if time_passes:
             updater.update_all()
 
 

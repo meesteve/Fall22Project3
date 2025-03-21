@@ -1,5 +1,5 @@
 import os
-from random import *
+import random
 import math
 
 def clear():
@@ -36,12 +36,12 @@ def fish_game():
             print("You can't cry.\n")
             input("Press enter to continue...")
         def swim(self):
-            dist = randint(15,25)
+            dist = random.randint(15,25)
             self.distance += dist
             clear()
             print(f"You swim {dist} meters upstream.")
             print()
-            if random() < 0.1/(1+math.e**(-0.001*(self.distance-2000))):
+            if random.random() < 0.1/(1+math.e**(-0.001*(self.distance-2000))):
                 print("You've been eaten by a bear!")
                 self.health = 0
             if self.health <= 0:
@@ -60,7 +60,7 @@ def fish_game():
         def reproduce(self):
             kids = 0
             for i in range(int(self.distance ** 0.3)):
-                kids += randint(0, 5)
+                kids += random.randint(0, 5)
             clear()
             if kids == 0:
                 print('You failed to have children.\nYou are a horrible salmon.')
@@ -146,7 +146,7 @@ def fish_game():
                     playing = False
                 case "kids":
                     player.look_at_kids()
-                case other:
+                case _:
                     clear()
                     print("Not a valid command!\n")
                     input("Press enter to continue...")

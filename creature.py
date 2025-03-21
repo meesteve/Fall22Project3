@@ -1,7 +1,7 @@
 import random
 import updater
 import os
-from item import *
+import item
 
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -124,10 +124,10 @@ class Enemy(Creature):
     def __init__(self, name, health, attack, room):
         super().__init__(name, health, attack, room)
         self.kind = 'Enemy'
-        self.items = [Gold("Gold", "Hunk of gold.") for _ in range(10)]
+        self.items = [item.Gold("Gold", "Hunk of gold.") for _ in range(10)]
     # updates self, attacks player if player in room, else does default Creature behavior
     def update(self):
-        if self.room.player != False:
+        if self.room.player:
             self.attack(self.room.player)
         else:
             super().update()
@@ -183,14 +183,14 @@ class Friend(Creature):
         self.kind = 'Friend'
     # follows player around, attacks enemy creatures
     def update(self):
-        if self.room.player != False:
+        if self.room.player:
             for m in self.room.creatures:
                 if m.kind == 'Enemy':
                     self.attack(m)
                     return None
         else:
             for r in self.room.exits:
-                if r[1].player != False:
+                if r[1].player:
                     self.move_to(r[1])
                     return None
             super().update()
